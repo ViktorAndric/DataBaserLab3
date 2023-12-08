@@ -1,0 +1,24 @@
+﻿@page "/"
+@using Blazored.Toast.Services;
+@using DatabaserLab3.Data;
+@using DatabaserLab3.Models;
+@inject IToastService Toastservice
+
+<PageTitle>Index</PageTitle>
+
+<h1>All Users</h1>
+@foreach(var user in users)
+{
+	<p>@user.FirstName @user.LastName, @user.Age år</p>
+}
+
+
+@code{
+	private List<UserModel> users = new List<UserModel>();
+
+	protected override void OnInitialized()
+	{
+		users = MongoCrud.GetAllUsers("Users");
+	}
+	
+}

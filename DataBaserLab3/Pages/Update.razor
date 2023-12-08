@@ -1,0 +1,87 @@
+﻿@page "/updatepage"
+@using Blazored.Toast.Services;
+@using DatabaserLab3.Data
+@using DatabaserLab3.Models;
+@inject IToastService Toastservice
+
+<PageTitle>Update User</PageTitle>
+
+<h1>Update or Delete User</h1>
+
+<h4>Update User</h4>
+<EditForm Model="editUser" OnValidSubmit="HandleValidSubmit" class="edit-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>Choose User to Edit: </label>
+        <select value="@selectedUserId" @onchange="OnQuestionSelected">
+            <option value=" "></option>
+            @foreach (var user in users)
+            {
+                <option value="@user.Id">@user.FirstName @user.LastName</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label for="firstname">Firstname: </label>
+        <InputText id="firstname" @bind-Value="editUser.FirstName" />
+    </div>
+     <div>
+        <label for="lastname">Lastname: </label>
+        <InputText id="lastname" @bind-Value="editUser.LastName" />
+    </div>
+    <div>
+        <label for="age">Age: </label>
+        <InputNumber id="age" @bind-Value="editUser.Age" />
+    </div>
+   
+    <button type="submit">Update User</button>
+</EditForm>
+
+<h4>Delete User</h4>
+<EditForm Model="deleteUser" OnValidSubmit="HandleValidSubmitDelete" class="edit-form">
+    <div>
+        <label>Choose User to Delete: </label>
+        <select>
+            <option value=" "></option>
+            @foreach (var user in users)
+            {
+                <option value="@user.Id">@user.FirstName @user.LastName</option>
+            }
+        </select>
+    </div>
+    <button type="submit">Delete User</button>
+</EditForm>
+
+@code {
+
+    private UserModel editUser = new UserModel();
+    private UserModel deleteUser = new UserModel();
+    private Guid selectedUserId;
+    private List<UserModel> users = new List<UserModel>();
+
+    protected override void OnInitialized()
+    {
+        users = MongoCrud.GetAllUsers("Users");
+    }
+
+    private void HandleValidSubmit()
+    {
+        MongoCrud.UpdateUser("Users", editUser);
+        Toastservice.ShowSuccess("The user has been updated");
+        editUser = new UserModel();
+    }
+
+    private void OnQuestionSelected(ChangeEventArgs e)
+    {
+        selectedUserId = new Guid(e.Value.ToString());
+        editUser = MongoCrud.GetUserById("Users", selectedUserId);
+        deleteUser = new UserModel();
+    }
+
+    private void HandleValidSubmitDelete()
+    {
+        MongoCrud.DeleteUser("Users", deleteUser);
+        Toastservice.ShowSuccess("The user has been deleted");
+    }
+}

@@ -1,0 +1,39 @@
+﻿@page "/create"
+@using Blazored.Toast.Services;
+@using DatabaserLab3.Models;
+@using DatabaserLab3.Data;
+@inject IToastService Toastservice
+
+
+<PageTitle>Add new user</PageTitle>
+
+<h4>Add new User</h4>
+<EditForm Model="@newUser" OnValidSubmit="HandleValidSubmitQuestion" class="edit-form">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div>
+        <label for="firstname">Write Firstname here: </label>
+        <InputText id="firstname" @bind-Value="newUser.FirstName"/>
+    </div>
+    <div>
+        <label for="lastname">Write Lastname here:</label>
+        <InputText id="lastname" @bind-Value="newUser.LastName" />
+    </div>
+    <div>
+        <label for="age">Insert age:</label>
+        <InputNumber id="age" @bind-Value="newUser.Age" />
+    </div>
+   
+    <button class="btn btn-primary" type="submit">Add User</button>
+</EditForm>
+ 
+@code {
+    private UserModel newUser = new UserModel();
+
+    private void HandleValidSubmitQuestion()
+    {
+        MongoCrud.AddUser("Users", newUser);
+        Toastservice.ShowSuccess("User has been added");
+        newUser = new UserModel();
+    }
+}
